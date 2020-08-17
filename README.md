@@ -23,7 +23,7 @@ Command line worked perfectly using:
 <h2>Key differences between R and Python</h3>
 
 <h3>R</h3>
-+ ggplot2 is a good plotting library for R. 
++ ggplot2 is a good plotting library for R. <br>
 + Importing datasets from a package and from a url.
 
 
