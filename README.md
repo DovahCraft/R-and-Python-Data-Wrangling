@@ -17,3 +17,14 @@ Export to pdf works badly in Jupyter's gui, trying on the command line.
 Command line worked perfectly using:
 
 **jupyter nbconvert Chp1Exercises.ipynb --to pdf**
+
+
+<h2>Key differences between R and Python</h3>
+
+<h3>R</h3>
++ ggplot2 is a good plotting library for R. 
++ Importing datasets from a package and from a url.
+
+
+<h3>Python</h3>
+- Reading csv's using the pandas and requests libraries.
