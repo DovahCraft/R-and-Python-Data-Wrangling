@@ -11,3 +11,9 @@ Jupytr Notebook contains IPython Notebooks: https://www.youtube.com/watch?v=HW29
   - Redirect to localhosted jupyter repo.
  
  
+Pandas and file reading: https://realpython.com/pandas-python-explore-dataset/
+ 
+Export to pdf works badly in Jupyter's gui, trying on the command line. 
+Command line worked perfectly using:
+
+**jupyter nbconvert Chp1Exercises.ipynb --to pdf**
