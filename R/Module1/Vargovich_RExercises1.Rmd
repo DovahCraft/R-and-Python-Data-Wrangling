@@ -1,0 +1,59 @@
+---
+title: "R Exercises 1 "
+author: "Joseph Vargovich"
+date: "8/12/2020"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Exercise 1
+Calculate log(6.2) first using base e and second using base 10.
+
+```{r}
+#log(6.2, exp(1)) Default value of log is exp(1), or e for short.  
+log(6.2)
+
+#Just use the log10 function instead 
+log10(6.2)
+```
+
+## Exercise 2
+Calculate the square root of 2 and save the result as the variable named sqrt2. Have R display the decimal value of sqrt2. Hint: use Google to find the square root function. Perhaps search on the keywords “R square root function”.
+
+```{r}
+sqrt2 <- sqrt(2)
+sqrt2
+```
+
+
+
+## Exercise 3
+This exercise walks you through installing a package with all the datasets used in the textbook The Statistical Sleuth.
+
+Install the package Sleuth3 on your computer using RStudio.
+Load the package using the library() command.
+Print out the dataset case0101
+```{r}
+#Code to install the Sleuth3 package.
+#install.packages("Sleuth3")
+
+#First, load the package.
+library(Sleuth3)
+
+#Load readr to export to csv for Python solution
+library(readr)
+
+#Print the dataset case0101
+data("case0101")
+write.csv(case0101, "Slueth.csv", row.names = F)
+head(case0101)
+```
+
+ 
+ 
