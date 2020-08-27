@@ -26,7 +26,14 @@ Command line worked perfectly using:
 <h3>R</h3>
 + ggplot2 is a good plotting library for R. <br>
 + Importing datasets from a package and from a url.
++ Rmd files instead of Jupyter
 
 
 <h3>Python</h3>
-- Reading csv's using the pandas and requests libraries.
++ Pandas is a huge component of Python Data Wrangling. Encompasses the data frame and csv reading for example. 
++ No really good ggplot equivalent in Python. The libraries that are available feel like R anyway if they try to emulate ggplot2. 
++ Jupyter Notebook (formally/now encompasses IPython Notebooks)
+
+
+# Presentation
+Coming Soon!
