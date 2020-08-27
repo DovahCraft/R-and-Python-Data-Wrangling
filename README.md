@@ -2,7 +2,7 @@
 
 Home of my Fall 2020 Honors project. Goal is to learn about key data science tools and compare and contrast the two key languages for it: R and Python. 
 
-<h2>Key differences between R and Python</h3>
+<h2>Key differences between R and Python</h2>
 
 <h3>R</h3>
 + ggplot2 is a good plotting library for R. <br>
