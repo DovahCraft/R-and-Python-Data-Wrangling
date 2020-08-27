@@ -30,8 +30,8 @@ Command line worked perfectly using:
 
 
 <h3>Python</h3>
-+ Pandas is a huge component of Python Data Wrangling. Encompasses the data frame and csv reading for example. 
-+ No really good ggplot equivalent in Python. The libraries that are available feel like R anyway if they try to emulate ggplot2. 
++ Pandas is a huge component of Python Data Wrangling. Encompasses the data frame and csv reading for example. <br>
++ No really good ggplot equivalent in Python. The libraries that are available feel like R anyway if they try to emulate ggplot2. <br> 
 + Jupyter Notebook (formally/now encompasses IPython Notebooks)
 
 
