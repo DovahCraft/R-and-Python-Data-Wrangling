@@ -1,5 +1,6 @@
-# STA-444-445-Python-and-R
-Collection of Python and R code for STA 444/445
+# R and Python Data Wrangling
+
+Fall 2020 Honor's Project Home. Goal is to learn about key data science tools and compare and contrast the two key languages for it: R and Python. 
 
 **Exercise 1 (8/17/2020)**
 
