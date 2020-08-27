@@ -56,6 +56,9 @@ Command line worked perfectly using:
 
 
 
+# Useful Resources
+R Graphics Cookbook for Plots, Graphics, and Graphs. http://www.cookbook-r.com/Graphs/ <br>
+Used to create textbooks using R markdown. https://bookdown.org
 
 
 
