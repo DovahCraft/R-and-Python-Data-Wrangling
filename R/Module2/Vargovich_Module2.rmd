@@ -1,0 +1,48 @@
+---
+title: "Vargovich_RModule2"
+author: "Joe Vargovich"
+date: "8/19/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 1:  
+### Create a data frame “by hand” with the names, ages, and heights of your own family.
+```{r}
+#Create a raw data frame using the old method without tidyverse. 
+myFamily <- data.frame(
+  names = c('Joe', 'Mom', 'Ashley', 'Peanut', 'Kitty', 'BigNasty'),
+  age = c(21, 55, 22, 10, 11, 4),
+  heights = c(74, 64, 68, 12, 12, 9)
+)
+myFamily
+```
+## Exercise 2: 
+### Find the mean age of my family. 
+```{r}
+myFamily$age
+mean(myFamily$age)
+```
+## Exercise 3:  
+### Import and parse with readr from https://raw.githubusercontent.com/dereksonderegger/570L/master/data-raw/Example_1.csv.
+
+### a. https://raw.githubusercontent.com/dereksonderegger/570L/master/data-raw/Example_1.csv
+
+
+```{r}
+#Load the readr package
+library(readr)
+
+#Store the GH link in a variable so it doesn't clog the readr function call 
+link = "https://raw.githubusercontent.com/dereksonderegger/570L/master/data-raw/Example_1.csv"
+
+exampleData = read_csv(url(link))
+
+head(exampleData)
+```
+
+
+

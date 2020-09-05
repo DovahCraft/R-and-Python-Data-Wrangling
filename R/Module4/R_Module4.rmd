@@ -1,0 +1,87 @@
+---
+title: "R_Module4"
+author: "Joe Vargovich"
+date: "9/2/2020"
+output: pdf_document
+---
+
+```{r message=FALSE}
+library(tidyverse, quietly=TRUE)
+options(dplyr.summarise.inform=FALSE)
+```
+
+
+# Exercise 1
+##### Load the dataset chickweight
+```{r}
+data("ChickWeight")
+write.csv(ChickWeight, "chickWeight.csv")
+head(ChickWeight)
+
+
+```
+#### Apply the filter function to get measurements from day 10 OR day 20.
+```{r}
+day10_20 <- ChickWeight %>% filter(Time == 10 | Time == 20)
+head(day10_20)
+
+#Get the mean and sd of each group and display them. 
+day10_20 %>%
+    group_by(Diet) %>%
+    summarize(n = n(),
+              mean.weight = mean(weight),
+              sd.weight = sd(weight))
+```
+
+ 
+# Exercise 2
+
+The OpenIntro textbook on statistics includes a data set on body dimensions. Instead of creating an R chunk for each step of this problem, create a single R pipeline that performs each of the following tasks.
+
+
+
+```{r}
+#a. Load the file
+body <- read.csv('http://www.openintro.org/stat/data/bdims.csv')
+
+#b. The column sex is coded as a 1 if the individual is male and 0 if female. This is a non-intuitive labeling system. Create a new column sex.MF that uses labels Male and Female.
+body <- body %>%
+  mutate(sex.MF = if_else(sex == 1, 'Male', 'Female'))
+
+#c. The columns wgt and hgt measure weight and height in kilograms and centimeters (respectively). Use these to calculate the Body Mass Index (BMI) for each individual.
+body <- body %>%
+  mutate(bmi = (wgt)/(hgt/100)^2)
+
+#d My calculation was not initially correct, I was using the wrong units.
+
+#e. The function cut takes a vector of continuous numerical data and creates a factor based on your give cut-points. Create a new column of in the data frame that divides the age into decades (10-19, 20-29, 30-39, etc). Notice the oldest person in the study is 67.
+body <- body %>%
+  mutate(Age.Grp = cut(age,
+                        breaks=c(10,20,30,40,50,60,70),
+                        right=FALSE))
+
+#f. Find the average BMI for each Sex by Age.Grp combination.
+body %>% 
+  group_by(sex.MF, Age.Grp) %>%
+  summarize(n = n(),
+              mean.bmi = mean(bmi))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
