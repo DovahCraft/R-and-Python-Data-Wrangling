@@ -8,6 +8,7 @@ Home of my Fall 2020 Honors project. Goal is to learn about key data science too
 + ggplot2 is a good plotting library for R. <br>
 + Importing datasets from a package and from a url.
 + Rmd files instead of Jupyter
++ MUCH BETTER wrangling functions within the tidyverse and dplyr. Chapter 4 was a pain with Python Pandas. Far too verbose. 
 
 
 <h3>Python</h3>
@@ -56,9 +57,35 @@ Command line worked perfectly using:
 
 
 
+
+**Module 4 (9/04/2020)**
+
+Filtering in python based on multiple values: https://thispointer.com/python-pandas-select-rows-in-dataframe-by-conditions-on-multiple-columns/
+
+Mutating and creating new columns in df with a for loop and iterrows(): https://stackoverflow.com/questions/56916916/pandas-calculations-across-rows-and-columns
+
+Cut function in Pandas: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.cut.html
+
+Pd cut: https://stackoverflow.com/questions/45751390/pandas-how-to-use-pd-cut
+
+To access and add dataframe: 
+
+body[<colName>] = <Whatever you want to add>
+  
+ 
+
+**Needed libraries:**
+
+**Pandas** for data frames
+
+**Requests** for grabbing the remote csv
+
+**Numpy** for np.arrays to interface with a data frame
+
 # Useful Resources
 R Graphics Cookbook for Plots, Graphics, and Graphs. http://www.cookbook-r.com/Graphs/ <br>
 Used to create textbooks using R markdown. https://bookdown.org
+
 
 
 
