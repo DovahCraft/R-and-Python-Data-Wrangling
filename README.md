@@ -58,6 +58,7 @@ Command line worked perfectly using:
 
 
 
+
 **Module 4 (9/04/2020)**
 
 Filtering in python based on multiple values: https://thispointer.com/python-pandas-select-rows-in-dataframe-by-conditions-on-multiple-columns/
@@ -72,7 +73,15 @@ To access and add dataframe:
 
 body[<colName>] = <Whatever you want to add>
   
+  
+**Module 5 (9/11/2020)**
+Fitting models with statsmodels.api in Python: statsmodels.org/stable/gettingstarted.html
  
+Scatterplots with facet grid using Seaborn: https://seaborn.pydata.org/generated/seaborn.FacetGrid.html
+
+Deleting rows based on condition: https://stackoverflow.com/questions/18172851/deleting-dataframe-row-in-pandas-based-on-column-value
+
+**Is something wrong with your RMarkdown Knit positioning? It is probably your headers. Check that the number of # symbols you have is valid. Two is preferrable for exercise headings.**
 
 **Needed libraries:**
 
