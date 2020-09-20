@@ -89,6 +89,18 @@ Get confidence intervals from Python statsmodels: https://stackoverflow.com/ques
 
 **Is something wrong with your RMarkdown Knit positioning? It is probably your headers. Check that the number of # symbols you have is valid. Two is preferrable for exercise headings.**
 
+**Module 6/7(9/20/2020)**
+
+R normals refernce: https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Normal.html
+
+Sorting columns by another column in Python Pandas: https://stackoverflow.com/questions/34347041/pandas-sort-a-column-by-values-in-another-column
+https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.sort_values.html
+
+Seaborn lineplots: https://seaborn.pydata.org/generated/seaborn.lineplot.html
+
+Seaborn graph gallery: https://seaborn.pydata.org/examples/index.html
+
+
 **Needed libraries:**
 
 **Pandas** for data frames
