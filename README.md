@@ -100,6 +100,28 @@ Seaborn lineplots: https://seaborn.pydata.org/generated/seaborn.lineplot.html
 
 Seaborn graph gallery: https://seaborn.pydata.org/examples/index.html
 
+**Module 8/9(9/27/2020)**
+
+
+Guide to vectors, lists, and matricies in Python with NumPy: https://www.oreilly.com/library/view/machine-learning-with/9781491989371/ch01.html
+
+
+Drop NA from dataframe Pandas: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.dropna.html
+
+
+Drop NA columns: https://stackoverflow.com/questions/45147100/pandas-drop-columns-with-all-nans
+
+
+Select based on condition Pandas DF: https://chrisalbon.com/python/data_wrangling/pandas_selecting_rows_on_conditions/
+
+
+Select all but one column: https://stackoverflow.com/questions/29763620/how-to-select-all-columns-except-one-column-in-pandas
+
+
+Select from matrix numpy: https://thispointer.com/python-numpy-select-rows-columns-by-index-from-a-2d-ndarray-multi-dimension/
+
+
+Ndarray to fill in values to specified matrix size: https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html
 
 **Needed libraries:**
 
