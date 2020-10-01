@@ -1,0 +1,167 @@
+---
+title: "Module6"
+author: "Joe Vargovich"
+date: "9/18/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Exercise 1 - Work with the political candidate dataset.
+```{r}
+#Import the data from GH.
+prez <- readr::read_csv('https://raw.githubusercontent.com/dereksonderegger/444/master/data-raw/Prez_Candidate_Birthdays')
+
+#a. Re-code the Gender column to have Male and Female levels. 
+  #Similarly convert the party variable to be Democratic or Republican.
+prez = prez %>% 
+  mutate(Party = ifelse(Party == "D", "Democrat", "Republican" ))
+head(prez)
+#b. Change Bernie Sanders to "Independent"
+# Select the row where the candidate is Bernie Sanders 
+# and set just his party to Independent. 
+prez$Party[prez$Candidate == "Bernie Sanders"] = "Independent"
+tail(prez)
+```
+# Exercise 2 - Density function of X and conditionals for valid values of x. 
+
+### Sample code for built in density function
+```{r}
+a <- 4      # The min and max values we will use for this example
+b <- 10     # Could be anything, but we need to pick something
+
+x <- runif(n=1, 0,10)  # one random value between 0 and 10 
+
+# what is value of f(x) at the randomly selected x value?  
+dunif(x, a, b)
+```
+### a. We need a <= x <= b to return 1/b-a, otherwise return 0.
+```{r}
+
+a <- 4
+b <- 10
+x <- runif(n=1, 0,10)  # one random value between 0 and 10 
+
+if( x < a ){
+  result <- 0
+}else if( x <= b ){
+  result <- 1/(b-a) #Parenthesis are important here! Order of ops.
+}else{
+  result <- 0
+}
+
+print(paste('x=',round(x,digits=3), '  result=', round(result,digits=3)))
+
+```
+### b. Create conditionals with the "and" and the "or" operators to calculate the density function properly.
+```{r}
+#i. 
+x <- runif(n=1, 0,10)  # one random value between 0 and 10 
+if( (a<=x) & (x<=b) ){ # AND (&) is necessary here as both bounds apply
+  result <- 1/(b-a)
+}else{
+  result <- 0
+}
+print(paste('x=',round(x,digits=3), '  result=', round(result,digits=3)))
+
+#ii.
+x <- runif(n=1, 0,10)  # one random value between 0 and 10 
+if( (x<a) | (b<x) ){ # OR (|) is needed here as either condition would break 
+  result <- 0         # the bounds of the density function
+}else{
+  result <- 1/(b-a)
+}
+print(paste('x=',round(x,digits=3), '  result=', round(result,digits=3)))
+
+#iii.
+x <- runif(n=1, 0,10)  # one random value between 0 and 10 
+result <- ifelse( a<x & x<b, 1/(b-a), 0 )
+print(paste('x=',round(x,digits=3), '  result=', round(result,digits=3)))
+
+```
+# Exercise 3 - For loops to create multiple graphs concisely
+
+### Example code for the desired graph
+```{r}
+df <- 4
+N <- 1000
+x <- seq(-4, 4, length=N)
+
+data <- data.frame( 
+  x = c(x,x),
+  y = c(dnorm(x), dt(x, df)),
+  type = c( rep('Normal',N), rep('T',N) ) )
+
+write.csv(data, "degreeFreedomGraph.csv")
+
+# make a nice graph
+myplot <- ggplot(data, aes(x=x, y=y, color=type, linetype=type)) +
+  geom_line() +
+  labs(title = paste('Std Normal vs t with', df, 'degrees of freedom'))
+
+# actually print the nice graph we made
+print(myplot) 
+```
+
+### a. Use a for loop to create similar graphs for degrees of freedom 2,3,4 ..., 29,30
+```{r}
+df = 4
+# make a nice graph
+  data <- data.frame( 
+  x = c(x,x),
+  y = c(dnorm(x), dt(x, df)),
+  type = c( rep('Normal',N), rep('T',N) ) )
+
+
+for(df in 2:30){
+  #Update our y column for each df value
+  data$y <- c(dnorm(x), dt(x, df))
+  
+  #Create a new plot for each new y column
+  myplot <- ggplot(data, aes(x=x, y=y, color=type, linetype=type)) +
+    geom_line() +
+    labs(title = paste('Std Normal vs t with', df, 'degrees of freedom'))
+  
+  print(myplot)
+}
+```
+
+### b. Use a for loop to create similar graphs for degrees of freedom 2,3,4,5,10,15,20 25,30
+```{r}
+dfVec = c(2,3,4,5,10,15,20,25,30)
+for(df in dfVec){
+  # Update our y column for each df value
+  data$y <- c(dnorm(x), dt(x, df))
+  
+  # Make a graph to reflect each new df value  
+  myplot <- ggplot(data, aes(x=x, y=y, color=type, linetype=type)) +
+    geom_line() +
+    labs(title = paste('Std Normal vs t with', df, 'degrees of freedom'))
+  
+  print(myplot)
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

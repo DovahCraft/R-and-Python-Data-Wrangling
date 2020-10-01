@@ -1,0 +1,87 @@
+---
+title: "Module7"
+author: "Joe Vargovich"
+date: "9/19/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)   # loading ggplot2 and dplyr
+options(dplyr.summarise.inform=FALSE) # Don't annoy me with summarise messages
+```
+
+# Exercise 1 - FloridaLakes ordered bar graph
+```{r}
+library(Lock5Data)
+data('FloridaLakes', package='Lock5Data')
+write.csv(FloridaLakes, "FloridaLakes.csv")
+
+#Order the rows by AvgMercury
+FloridaLakes = FloridaLakes %>%
+  mutate(Lake = fct_reorder(Lake, AvgMercury))
+head(FloridaLakes)
+
+# Create the graph from the ordered dataframe
+lakeGraph = FloridaLakes %>%
+  ggplot(aes(x= Lake, y = AvgMercury)) +
+  geom_col(width = 1, position ="dodge" ) +
+  coord_flip() +
+    labs(title = 'Average Mercury Content of Lakes in Florida')
+lakeGraph
+
+
+```
+
+
+# Exercise 2 - FootballBrain box plot with changed labels in the Group column
+```{r}
+data('FootballBrain', package='Lock5Data')
+write.csv(FootballBrain, "FootballBrain.csv")
+
+FootballBrain = FootballBrain %>%
+    mutate( Group = fct_recode(Group, 'Concussion'='FBConcuss'),
+          Group = fct_recode(Group, 'No Concussion' ='FBNoConcuss') )
+
+#Filter out any rows that do not have data for Congition. 
+FootballBrain  = FootballBrain %>% filter(Cogniton > 0)
+
+# Print the head of the modified dataframe
+head(FootballBrain)
+
+#Create and print our boxplot
+FootballBrain %>%
+  ggplot(aes(x=Group, y=Cogniton)) +
+    geom_boxplot() +
+    labs(title = 'Difference In Cognitive Ability Due To Concussion')
+
+
+```
+
+# Exercise 3 - ResturauntTips data and factoring. 
+```{r}
+data('RestaurantTips', package='Lock5Data')
+write.csv(RestaurantTips, "RestaurantTips.csv")
+
+RestaurantTips = RestaurantTips %>%
+    mutate( Day = fct_recode(Day, 'Monday'='m'),
+          Day = fct_recode(Day, 'Tuesday' ='t'),
+          Day = fct_recode(Day, 'Wednesday'='w'),
+          Day = fct_recode(Day, 'Thursday'='th'),
+          Day = fct_recode(Day, 'Friday'='f'),
+          Day = fct_relevel(Day, 'Monday', 'Tuesday', 'Wednesday', 
+                            'Thursday', 'Friday'),
+          Credit = fct_recode(Credit, 'Cash'='n'),
+          Credit = fct_recode(Credit, 'Credit'='y'))
+
+#Print our modified dataframe.
+head(RestaurantTips)
+
+#Create and print out our graph
+RestaurantTips %>%
+  ggplot(aes(x=Bill, y=PctTip)) +
+    geom_point() +
+    facet_grid(Credit ~ Day) +
+    labs(title = 'Tip Percentages Based On The Total Bill And Payment Methods')
+```
+

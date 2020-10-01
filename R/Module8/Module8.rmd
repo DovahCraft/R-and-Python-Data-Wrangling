@@ -1,0 +1,209 @@
+---
+title: "Module8"
+author: "Joe Vargovich"
+date: "9/26/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Exercise 1 - Create vectors of length three and add them. 
+```{r}
+vec_a = c(2,4,6)
+vec_b = c(8,10,12)
+
+vec_c = vec_a + vec_b
+
+vec_c
+```
+
+# Exercise 2 - Addition of vectors of differing size
+```{r}
+vec_d = c(14,20)
+
+#The recycling rule allows us to add two vectors of differing length as we can 
+#recycle the values of the shorter one and add them to the longer vector. 
+vec_d + vec_a
+```
+# Exercise 3 - Add a constant to a vector       
+```{r}
+# Add 5 to the vector a.
+vec_a + 5
+
+#This works without error or warning as the one element is applied to each element
+# of the target vector. We are not adding vectors here! No warning! 
+```
+#Exercise 4 - Generate a vector of integers with two methods
+```{r}
+#1
+seq(1,5)
+
+#2
+1:5
+```
+
+#Exercise 5 - Generate a vector of even integers with two methods
+```{r}
+#1
+seq(2,20,2)
+
+#2
+(1:10) * 2
+```
+# Exercise 6 - Generate a vector of 21 evenly spaced elements between 0 and 1
+```{r}
+x = seq(0,1, length=21)
+
+x
+```
+# Exercise 7 - Generate a vector by repeating another one
+```{r}
+to_repeat = c(2,4,8)
+
+result = rep(to_repeat, 3)
+
+result
+```
+#Exercise 8 - Generate another vector with rep, with repeats in order using each
+```{r}
+result = rep(to_repeat, each=4)
+
+result
+
+```
+
+#Exercise 9  - Work with the letters R vector
+```{r}
+cat(as.character(letters), sep = ",", file = "letters.txt", append = TRUE)
+#a. Get the 9th element of letters
+letters[9]
+
+#b. Extract the subvector with the 9th, 11th, and 18th elements
+letters[c(9,11,18)]
+
+#c. Extract the subvector that is everything but the last two letters
+letters[1:24]
+```
+#Exercise 10 - Create a matrix and perform operations
+```{r}
+#ai.- Using the matrix function and seq function
+matrix1 = matrix(seq(2,30, 2), nrow = 3, ncol = 5, byrow=TRUE)
+matrix1
+
+#aii. - Chaining rbinds
+row1 = seq(2,10, 2)
+row2 = seq(12,20, 2)
+row3 = seq(22,30, 2)
+matrix2 = rbind(row1,row2) %>%
+  rbind(row3)
+
+matrix2
+
+#b. Grab the second row of our matrix
+matrix1[2,]
+
+#c. Grab the second element of the third row of our matrix
+matrix1[3,2]
+```
+#Exercise 11 - Create and manipulate a data frame. 
+```{r}
+#a. Create dataframe my.trees
+my.trees = data.frame(
+  Girth = c(8.3, 8.6,8.8,10.5, 10.7, 10.8, 11.0),
+  Height = c(70, 65, 63, 72, 81, 83, 66),
+  Volume = c(10.3, 10.3, 10.2, 16.4, 18.8, 19.7, 15.6)
+)
+
+#b. Extract the third observation (row) fron the dataframe
+my.trees[3,]
+
+#c. Extract the Girth column by name
+my.trees$Girth
+
+#d. Extract all but the fourth row
+my.trees[-c(4),]
+
+#e. Use the which command to create a vector on condition
+index = which(my.trees$Girth > 10)
+index
+
+#f. Create a data set with just the large trees
+large.trees = data.frame(
+  Girth = my.trees$Girth[index],
+  Height = my.trees$Height[index],
+  Volume = my.trees$Volume[index]
+)
+large.trees
+
+#g. Create a data set with just the small trees
+small.trees = data.frame(
+  Girth = my.trees$Girth[-c(index)],
+  Height = my.trees$Height[-c(index)],
+  Volume = my.trees$Volume[-c(index)]
+)
+small.trees
+```
+#Exercise 12 - Describe the differnece between the two data frame row removal methods
+```{r}
+df <- data.frame(name= c('Alice','Bob','Charlie','Daniel'),
+                 Grade = c(6,8,NA,9))
+
+#This will remove the rows that are na as per the - sign. 
+df[ -which(  is.na(df$Grade) ), ]
+#This will only select the rows that are not na. The ! operator negates the is.na boolean. 
+df[  which( !is.na(df$Grade) ), ]
+```
+
+#Exercise 13 - Using expand.grid
+```{r}
+expand.grid( F1=c('A','B'), F2=c('x','w','z'), replicate=1:2 )
+
+
+expand.grid( x=seq(-4,4,by=.01), 
+             dist=c('Normal','t'), 
+             df=c(2,3,4,5,10,15,20,30) ) %>%
+  mutate( y = if_else(dist == 't', dt(x, df), dnorm(x) ) ) %>%
+  ggplot( aes( x=x, y=y, color=dist) ) + 
+  geom_line() + 
+  facet_wrap(~df)
+```
+#Exercise 14 - Create and manipulate a list
+```{r}
+#a. List creation
+x = c(4,5,6,7,8,9,10)
+y = c(34,35,41,40,45,47,51)
+slope = 2.82
+p.value = 0.000131
+
+listStruct = list(X = x, Y=y, Slope=slope, Pval=p.value)
+listStruct
+
+#b. Grab the second value of the list (which is y)
+listStruct[2]
+
+#c. Grab our p-value
+listStruct['Pval']
+```
+#Exercise 15 - Examine the data structures used with linear models lm()
+```{r}
+#a. Load the cherry trees dataset
+data(trees)
+
+#b. Examine the data frame using str()
+str(trees)
+
+#c. Perform a regression relating volume of lumber to the girth and height of the tree
+m = lm(Volume ~ Girth + Height, data=trees)
+
+#d. Use the str command to inspect the model m. Extract the coefficients from the list.
+str(m)
+
+m['coefficients']
+```
+
+
+
+

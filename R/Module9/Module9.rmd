@@ -1,0 +1,29 @@
+---
+title: "Module9"
+author: "Joe Vargovich"
+date: "9/27/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+```
+
+# Exercise 1 - Reading in an excel file with skipped lines.
+
+```{r}
+#Use the optional range parameter of the read_excel function.
+data1 = read_excel('Example_5.xls', sheet='RawData', 'A5:C36')
+data1
+```
+
+# Exercise 2 - Reading in another excel spreadsheet and manipulating it.
+
+```{r}
+data2 = read_excel('Example_3.xls', sheet='data')
+#Drop the empty row by selecting only the row with a valid model. Also drop NA columns that linger. 
+data2 = data2[!is.na(data2$model), colSums(is.na(data2)) != nrow(data2)]
+tail(data2)
+```
+

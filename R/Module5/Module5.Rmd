@@ -1,0 +1,113 @@
+---
+title: "Module5"
+author: "Joseph Vargovich"
+date: "9/8/2020"
+output: pdf_document
+---
+```{r message=FALSE, echo=FALSE}
+library(tidyverse, quietly=TRUE)
+
+options(tibble.width=Inf)
+```
+
+
+
+## Exercise 1 - Using the trees data frame that comes pre-installed in R, fit the regression model that uses the tree Height to explain the Volume of wood harvested from the tree.
+```{r}
+data("trees")
+write.csv(trees, "trees.csv")
+#a. Graph the data.
+graph <- ggplot(trees, aes(x=Height, y=Volume)) +
+  geom_point()
+graph
+
+#b. Fit an lm model 
+model <- lm(Volume ~ Height, data=trees)
+
+
+
+#c. Print out table of coefficient names, estimated value, std erorr, and upper and lower confidence interval.
+summary(model)$coef
+predict(model)
+confint(model)
+
+#d. Add model fitted values to the trees data frame along with the regression model confidence intervals
+trees <- trees %>%
+  select(-matches('fit'), -matches('lwr'), -matches('upr')) %>%
+  cbind( predict(model, newdata=., interval='confidence') )
+head(trees)
+
+#e. Graph the data and fitted regression line and uncertainty ribbon. Add an annotation for the rsquared value. 
+modelRSqd = summary(model)$r.squared
+modelRSqd = round(modelRSqd, digits=3)
+  
+Rsq_str = paste('Rsq = ', modelRSqd)
+
+
+graph2 <- ggplot(trees, aes(x=Height, y=Volume)) +
+  geom_point() +
+  geom_line(aes(y=fit)) +
+  geom_ribbon(aes(ymin=lwr, ymax=upr), alpha = .2) +
+  annotate('label', x=70.0, y=75, size=6,  label=Rsq_str)
+graph2
+
+
+```
+
+
+## Exercise 2 - Work with the phbirths dataset from the farawaay package.
+```{r}
+library(faraway)
+data(phbirths)
+write.csv(phbirths, "phbirths.csv")
+#a. Create two scatter plots of gestational length and birthweight, one for each smoking status.
+
+# Lets make some more desciptive names for the smoke column. 
+phbirths = phbirths %>% 
+  mutate(smoke = if_else(smoke == 'TRUE', 'Smoker', 'NonSmoker'))
+
+#Now lets graph this modfied dataframe.
+smokeGraph <- ggplot(phbirths, aes(x=gestate, y = grams)) +
+  geom_point() +
+  facet_grid( . ~smoke)
+
+smokeGraph
+```
+
+
+```{r}
+#b. Filter results that are premature (less than 36weeks) to use only full term babies.
+phbirths = phbirths %>%
+  filter(gestate > 36)
+head(phbirths)
+
+#c. Fit a quadratic model to this data
+model <- lm(grams ~ poly(gestate,2) * smoke, data=phbirths)
+
+#d. Add the model fit values and CI to the dataframe
+phbirths <- phbirths %>%
+  select(-matches('fit'), -matches('lwr'), -matches('upr')) %>%
+  cbind( predict(model, newdata=., interval='confidence') )
+head(phbirths)
+
+#e. Add layers to the two scatterplot graphs for the model fits and uncertainties.
+smokeGraph36w <- ggplot(phbirths, aes(x=gestate, y = grams)) +
+  geom_point() +
+  geom_line(aes(y=fit)) +
+  geom_ribbon(aes(ymin=lwr, ymax=upr), alpha = .2) + 
+  facet_grid(.~smoke)
+smokeGraph36w
+
+#f. Create a column for the residuals in the phbirths data set
+phbirths = phbirths %>% mutate(residuals = resid(model))
+head(phbirths)
+
+#g. Create a histogram of the residuals
+residHistogram = ggplot(phbirths, aes(x=residuals)) +
+  geom_histogram()
+
+residHistogram
+
+    
+```
+
