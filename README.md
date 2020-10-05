@@ -123,6 +123,13 @@ Select from matrix numpy: https://thispointer.com/python-numpy-select-rows-colum
 
 Ndarray to fill in values to specified matrix size: https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html
 
+**Module 10/11(10/4/2020)**
+Benchmarking in a Jupyter notebook: https://stackoverflow.com/questions/32565829/simple-way-to-measure-cell-execution-time-in-ipython-notebook %%timeit and %%time are now magic commands in Python built in! 
+
+Magic commands: https://ipython.org/ipython-doc/3/interactive/magics.html
+
+Regex matching and compilation with re library in Python: https://docs.python.org/3/howto/regex.html
+
 **Needed libraries:**
 
 **Pandas** for data frames
