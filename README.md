@@ -130,6 +130,26 @@ Magic commands: https://ipython.org/ipython-doc/3/interactive/magics.html
 
 Regex matching and compilation with re library in Python: https://docs.python.org/3/howto/regex.html
 
+**Module 12(10/11/2020)** 
+**Used libraries:** 
+import pandas as pd
+import numpy as np
+import datetime
+from dateutil.relativedelta import relativedelta
+import pytz
+
+Python solution powered by the datetime https://docs.python.org/3/library/datetime.html
+Convert string to date: https://stackabuse.com/converting-strings-to-datetime-in-python/
+Python arithmetic on dates with relativedelta https://www.pythonprogramming.in/add-n-number-of-year-month-day-hour-minute-second-to-current-date-time.html
+Datedelta for arithmetic: https://pypi.org/project/datedelta/
+RelativeDelta to calculate intervals between dates: https://www.odoo.com/forum/help-1/question/how-do-i-calculate-number-of-months-between-two-dates-9443
+Alternate number of days between dates calculation: https://stackoverflow.com/questions/151199/how-to-calculate-number-of-days-between-two-given-dates
+Set primary index of pandas dataframe: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.set_index.html
+Filtering dataframe on dates (didn't work fully): https://stackoverflow.com/questions/22898824/filtering-pandas-dataframes-on-dates
+First and last row of dataframe: https://stackoverflow.com/questions/36542169/extract-first-and-last-row-of-a-dataframe-in-pandas
+Timezones with pytz: http://pytz.sourceforge.net/
+Misc lambda function examples: https://www.w3schools.com/python/python_lambda.asp
+
 **Needed libraries:**
 
 **Pandas** for data frames
