@@ -150,6 +150,11 @@ First and last row of dataframe: https://stackoverflow.com/questions/36542169/ex
 Timezones with pytz: http://pytz.sourceforge.net/
 Misc lambda function examples: https://www.w3schools.com/python/python_lambda.asp
 
+**Module 13(10/18/2020)**
+Good comparison of data reshaping with R and Python Pandas https://pandas.pydata.org/docs/getting_started/comparison/comparison_with_r.html
+Merging and combining in Pandas: https://pandas.pydata.org/pandas-docs/stable/user_guide/merging.html
+Count and Series to Dataframe conversions for problem 1: https://stackoverflow.com/questions/38933071/group-by-two-columns-and-count-the-occurrences-of-each-combination-in-pandas
+
 **Needed libraries:**
 
 **Pandas** for data frames
