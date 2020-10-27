@@ -1,0 +1,155 @@
+---
+title: "Module12"
+author: "Joe Vargovich"
+date: "10/5/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lubridate)
+```
+
+# Exercise 1 - For the following formats for a date, transform them into a date/time object. Which formats can be handled nicely and which are not?
+```{r}
+#NOTE: Year-Month-Day-Hours-Minutes-Secs (ymd) is standard for dates and time storage. 
+
+#a. September 13th
+birthday <- c(
+  'September 13, 1978',
+  'Sept 13, 1978',
+  'Sep 13, 1978',
+  'S 13, 1978',
+  '9-13-78',
+  '9-13/78',
+  '9/13/78')
+
+mdy(birthday)
+
+#HANDLED: This format worked fine with the mdy() function in lubridate. 
+#This utilized the rounding down to parse 78 to 1978.
+
+#b. 
+mdy('Sept 13, 1978')  # Why does this error out when it worked above?
+
+#ERRORED: The proper prefix for September is Sep, not Sept.
+#The mdy on a vector seems to handle this case, while the mdy
+# for a single string does not. 
+
+#c.
+birthday <- c(
+  'June 13, 1978',
+  'J 13, 1978')
+
+mdy(birthday)
+
+#ERRORED: The bottom date is supposed to have its month be 
+#June (06) but it is autoconverted to July (07) due to ambiguity. 
+#July is considered to be earlier in the alphabet than June. 
+```
+# Exercise 2 - Birthday caluclations
+```{r}
+#Input my birthday and today's date.
+birthday = mdy('April 21,1999')
+today = lubridate::today()
+#Create an interval from my birthday to today. 
+lifeInterval = birthday %--% today
+
+lifeInterval
+as.duration(lifeInterval)
+
+#a. My next birthday
+nextBirthday = update(birthday,year=2021) 
+nextBirthday
+
+#b. Number of days until my next birthday
+numDays = as.period(today %--% nextBirthday, unit='days')
+numDays
+
+#c. Number of months and days until my next birthday
+numMonths = as.period(today %--% nextBirthday, unit='months')
+numMonths
+
+#d. Date of my 64th birthday
+imOld = birthday + years(64)
+imOld
+
+#e. Number of years, months, and days until Im Old.
+timeLeft = as.period(today %--% imOld, unit='years')
+timeLeft
+```
+
+# Exercise 3 - AZ to New Zealand Timezone converison
+```{r}
+#a. 3 pm AZ time to Auckland, NZ time.
+meeting = ymd_hm('2015-5-8 15:00', tz='US/Arizona')
+  with_tz(meeting, 'Pacific/Auckland')
+```
+
+# Exercise 4 - Weather Station Plot Of Max Temperature    
+```{r warning=FALSE, message=FALSE}
+weatherData = invisible(read_csv("Pulliam_Airport_Weather_Station.csv"))
+
+#Clean it up! Select just the columns we need. 
+weatherData = weatherData %>%
+  select(DATE,TMAX)
+
+#Convert the doubles in the date column to date objects.
+weatherData = weatherData %>% mutate(
+  DATE = ymd(DATE)
+)
+#Grab the largest date in the dataframe. 
+largestDate = tail(weatherData$DATE, n=1)
+
+#Use dyears as we want an objective calculation of the temperature readings. 
+fiveYearsBefore = largestDate - dyears(5)
+
+#Filter to the dates we want between the max and five years before. 
+fiveYearData = weatherData %>% 
+  filter(DATE > fiveYearsBefore  )
+
+#Finally, plot the max temperatures over the past five years.
+temperaturePlot = ggplot(fiveYearData, aes(x=DATE, y=TMAX)) +
+  geom_line()
+
+head(fiveYearData)
+
+#The plot makes sense and cyclically reflects the seasons. 
+temperaturePlot
+```
+
+
+
+# Exercise 5 - Births on each day of the week throughout the year. 
+```{r}
+#a. Load the data 
+data('Births78', package='mosaicData')
+
+head(Births78)
+# Select only the dates and births
+Births78 = Births78 %>%
+  select(date, births)
+head(Births78)
+
+#b. Plot date and births with a scatterplot
+birthsPlot = ggplot(Births78, aes(x=date, y=births)) +
+  geom_point()
+birthsPlot
+
+#c. Add a column to Births78 to represent the day of the week.
+Births78 = Births78 %>% mutate(
+  Day = wday(date, label=TRUE, abbr=FALSE))
+head(Births78)
+
+#d. Plot the data again but this time label each day by color. 
+birthsPlot = ggplot(Births78, aes(x=date, y=births)) +
+  geom_point(aes(color=Day))
+
+birthsPlot
+
+#Explanation: Most births are planned, so they take place on weekdays.
+#Some months are busier than others overall. 
+```
+
+

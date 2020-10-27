@@ -1,0 +1,302 @@
+---
+title: "Module13"
+author: "Joe Vargovich"
+date: "10/13/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(lubridate)
+```
+
+# Exercise 1 - Table for gender and year combinations
+```{r}
+#a. Load the data.
+Survey <- read.csv('http://www.lock5stat.com/datasets/StudentSurvey.csv', na.strings=c('',' '))
+
+#b. Cleanup and order by the Year variable. We need the year and gender columns.
+Survey = Survey %>%
+  select(Gender, Year) %>%
+  drop_na()
+
+Survey$Year <- factor(Survey$Year, levels = c('FirstYear', 'Sophomore', 'Junior', 'Senior'))
+classCounts <- Survey[order(Survey$Year), ]
+
+classCounts = classCounts %>%
+  count(Year, Gender)
+classCounts
+
+classCounts = classCounts %>%
+  pivot_wider(names_from=Year, values_from=n) %>%
+  mutate(Gender = if_else(Gender=='F', 'Female','Male'))
+
+head(classCounts)
+```
+
+# Exercise 2 - US Govt Expenditures
+```{r}
+#a. Download and load the data, skip the first two garbage rows.
+expDf = read_excel("hist03z2.xls", skip=2)
+
+#b. Rename function or subfunction to Department
+expDf = rename(expDf, `Department` = `Function and Subfunction`)
+
+#c. Remove rows Total, Subtotal, (On-budget), (Off-budget). Remove rows at the bottom.
+#First, remove bottom rows.
+expDf = expDf %>% filter(row_number() <= n()-4)
+
+#Then filter out terms we do not want in our rows.
+expDf = filter(expDf, !str_detect(Department, "(Total|Subtotal|(On-budget)|(Off-budget))"))
+
+#d.Create a new column for ID_number and parse the Department column for it. 
+#Parse Department and extract ids using str_extract
+expDf = expDf %>% mutate(
+  Id_number = str_extract(Department,"([0-9][0-9][0-9])")
+)
+
+#e. Create Function and Subfunction columns.
+#First, copy Department to Subfunction
+expDf = expDf %>% mutate(
+  Subfunction = Department,
+  Function = ifelse(is.na(`2015`), Department, NA)
+)
+#Fill in NAs
+expDf = expDf %>%
+  fill(Function)
+
+#f. Remove function rows that did not have data for the 2015 column
+expDf = expDf %>%
+  na.omit(cols=seq_along(`2015`))
+
+#g. Reshape the data into four columns: Function, Subfunction, Year, and Amount. 
+reshapedDf = expDf %>%
+  pivot_longer(
+    `1962`:`2015`,
+    names_to = 'Year',
+    values_to = 'Amount') %>%
+    select(Subfunction:Amount) %>%
+    mutate(Function = str_remove_all(Function, '\\d|:'))
+head(reshapedDf)
+
+#h, i. Remove rows with ...... values and non-numeric values. 
+reshapedDf = filter(reshapedDf, !str_detect(Amount, "..........")) %>%
+  filter(!str_detect(Year, "(TQ)"))
+
+reshapedDf$Amount = as.numeric(as.character(reshapedDf$Amount))
+reshapedDf$Year = as.numeric(as.character(reshapedDf$Year))
+head(reshapedDf)
+
+#j. Line graph to compare spending for National Defense, Health, Medicare,
+# Income Security, and Social Security for each of the years 2001 through 2015
+#First, grab only measurements from 2001 to 2015.
+finalDf = filter(reshapedDf, Year >= 2001 & Year <= 2015 ) %>%
+  filter(str_detect(Function, "Department of Defense-Military|Health|Medicare|Income Security|Social Security")) %>%
+  group_by(Function, Year) 
+  #Some sort of sum function that I don't know how to use, then the graphing. 
+```
+
+
+
+# Exercise 3 - Working with two simple data sets.
+```{r}
+#Given data
+A <- tribble(
+  ~Name, ~Car,
+  'Alice', 'Ford F150',
+  'Bob',   'Tesla Model III',
+  'Charlie', 'VW Bug')
+
+B <- tribble(
+  ~First.Name, ~Pet,
+  'Bob',  'Cat',
+  'Charlie', 'Dog',
+  'Alice', 'Rabbit')
+
+#a. Join together with both cbind and join commands. 
+#cbind
+bindedData = cbind(A, B)
+head(bindedData)
+
+#left join
+joinedData = left_join(A,B, by=c("Name"="First.Name"))
+joinedData
+
+#b. Add row for Alice's guinea pig, add to table B!! Not the join! 
+guineaRow = tibble(First.Name="Alice", Pet="Guinea Pig")
+B = rbind(B, guineaRow)
+B
+
+#c. Combine the two datasets together with cbind and dplyr join.
+#In order to bind the two dataframes, we need to add a row to the B dataset so we can directly column bind.
+placeholderRow = tibble(Name=NA, Car=NA)
+
+biggerA = rbind(A, placeholderRow)
+biggerA
+bindedData2 = cbind(biggerA,B)
+bindedData2 #This is messier than the join operation.
+
+#Accomplish this with a simple join instead.
+joinedData2 = right_join(A,B, by=c("Name"="First.Name"))
+
+joinedData2 #Much cleaner! No NAs necessary!
+```
+
+# Exercise 4 - Table joins for Customers, Retailers, Cards, and Transactions.
+```{r}
+Customers <- tribble(
+  ~PersonID, ~Name, ~Street, ~City, ~State,
+  1, 'Derek Sonderegger',  '231 River Run', 'Flagstaff', 'AZ',
+  2, 'Aubrey Sonderegger', '231 River Run', 'Flagstaff', 'AZ',
+  3, 'Robert Buscaglia', '754 Forest Heights', 'Flagstaff', 'AZ',
+  4, 'Roy St Laurent', '845 Elk View', 'Flagstaff', 'AZ')
+
+Retailers <- tribble(
+  ~RetailID, ~Name, ~Street, ~City, ~State,
+  1, 'Kickstand Kafe', '719 N Humphreys St', 'Flagstaff', 'AZ',
+  2, 'MartAnnes', '112 E Route 66', 'Flagstaff', 'AZ',
+  3, 'REI', '323 S Windsor Ln', 'Flagstaff', 'AZ' )
+
+Cards <- tribble(
+  ~CardID, ~PersonID, ~Issue_DateTime, ~Exp_DateTime,
+  '9876768717278723',  1,  '2019-9-20 0:00:00', '2022-9-20 0:00:00',
+  '5628927579821287',  2,  '2019-9-20 0:00:00', '2022-9-20 0:00:00',
+  '7295825498122734',  3,  '2019-9-28 0:00:00', '2022-9-28 0:00:00',
+  '8723768965231926',  4,  '2019-9-30 0:00:00', '2022-9-30 0:00:00' ) 
+
+Transactions <- tribble(
+  ~CardID, ~RetailID, ~DateTime, ~Amount,
+  '9876768717278723', 1, '2019-10-1 8:31:23',    5.68,
+  '7295825498122734', 2, '2019-10-1 12:45:45',  25.67,
+  '9876768717278723', 1, '2019-10-2 8:26:31',    5.68,
+  '9876768717278723', 1, '2019-10-2 8:30:09',    9.23,
+  '5628927579821287', 3, '2019-10-5 18:58:57',  68.54,
+  '7295825498122734', 2, '2019-10-5 12:39:26',  31.84,
+  '8723768965231926', 2, '2019-10-10 19:02:20', 42.83) 
+
+Cards <- Cards %>% 
+  mutate( Issue_DateTime = lubridate::ymd_hms(Issue_DateTime),
+          Exp_DateTime   = lubridate::ymd_hms(Exp_DateTime) )
+Transactions <- Transactions %>% 
+  mutate( DateTime = lubridate::ymd_hms(DateTime))
+
+#a. Create a table that gives the credit card statement for Derek. Gives all transactions, amounts, and the store name. 
+head(Customers)
+#Filter the customers to Derek
+custDerek = Customers %>%
+  filter(Name == "Derek Sonderegger") %>%
+  select(Name)
+
+#Filter the cards to Derek
+cardDerek = Cards %>%
+  filter(PersonID == 1) %>%
+  select(PersonID,CardID)
+
+#Grab the card ID
+derekCardID = cardDerek$CardID[1]
+
+#Filter the transactions based on CardID
+transacDerek = Transactions %>%
+  filter(CardID == derekCardID)
+
+#Filter the retailers
+retailersDerek = Retailers %>%
+  filter(RetailID == 1) %>%
+  select(RetailID, Name, Street)
+
+#Finally, join these filtered dataframes.
+derekStatement = left_join(transacDerek, retailersDerek) %>%
+  select(!RetailID)
+derekStatement
+
+#b. Aubrey lost her credit card on Oct 15 2019 
+#Close Aubrey's credit card at 4:28:21PM and issue a new credit card in the Cards table.
+#Filter the Customers dataframe to get needed info
+custAubrey = Customers %>%
+  filter(Name == "Aubrey Sonderegger") %>%
+  select(Name, PersonID)
+
+#Grab Aubrey's ID
+aubreyID = custAubrey$PersonID[1]
+aubreyCard = Cards %>%
+  filter(PersonID == aubreyID)
+#head(aubreyCard)
+
+#Make a new card entry for Aubrey
+newCard <- tibble( CardID='6969927542021287', PersonID=2, Issue_DateTime=ymd_hms('2019-10-15 4:28:22'), Exp_DateTime=ymd_hms('2021-10-15 00:00:00') )
+
+#Add the new card
+Cards = Cards %>%
+  mutate(Exp_DateTime = if_else(PersonID == aubreyID, ymd_hms('2019-10-15 4:28:21'), Exp_DateTime )) %>%
+  full_join(.,newCard)
+
+#c. Generate new transaction for new card at KickStand Kafe.
+card = newCard$CardID
+retailId = 1
+datetime = ymd_hms('2019-10-16 14:30:21')
+amount = 4.98
+newPurchase = tibble(CardID = card, RetailID=retailId, DateTime=datetime, Amount = amount )
+
+#d. If the card is currently valid, this should return exactly 1 row.
+Valid_Cards <- Cards %>% 
+  filter(CardID == card, Issue_DateTime <= datetime, datetime <= Exp_DateTime)
+
+# If the transaction is valid, insert the transaction into the table
+if( nrow(Valid_Cards) == 1){
+  Transactions = rbind(Transactions, newPurchase)
+}else{
+  print('Card Denied')
+}
+
+#e. Create statement for Aubrey's cards.
+#Filter the customers to Aubrey
+custAubrey = Customers %>%
+  filter(Name == "Aubrey Sonderegger") %>%
+  select(Name)
+
+#Filter the cards to Aubrey
+cardsAubrey = Cards %>%
+  filter(PersonID == 2) %>%
+  select(PersonID,CardID)
+
+#Grab the card ID
+aubreyCardIDs = cardsAubrey$CardID[1:2]
+
+#Filter the transactions based on CardID
+transacAubrey = Transactions %>%
+  filter(CardID == aubreyCardIDs[1:2])
+
+#Finally, join the transactionAubrey and retailers dataframes.
+aubreyStatement = left_join(transacAubrey, Retailers) %>%
+  select(CardID, DateTime, Amount, Name)
+aubreyStatement
+
+```
+#Exercise 5 - nycflights13 
+```{r}
+data('flights', package='nycflights13')
+write.csv(flights, 'flights.csv')
+data('airports', package='nycflights13')
+write.csv(airports, 'airports.csv')
+data('airlines', package='nycflights13')
+write.csv(airlines, 'airlines.csv')
+
+head(flights)
+head(airports)
+head(airlines)
+
+
+#Filter to Virign America and the date/time, and then join with selected columns. 
+virginAmerica = flights %>%
+  filter(str_detect(carrier, "VX")) %>%
+  filter(month == 2 & day == 14) %>% #Filter to the date we want! 
+  select(carrier, dest, dep_time, air_time) %>%
+  left_join(., airports, by=c("dest"="faa"))
+
+head(virginAmerica)
+
+```
+
+

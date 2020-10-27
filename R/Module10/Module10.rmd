@@ -1,0 +1,176 @@
+---
+title: "Module10"
+author: "Joe Vargovich"
+date: "10/3/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(microbenchmark)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercise 1 - Create a duniform function for the density function.
+```{r}
+#a. Simple function without vector input. 
+duniform = function(x,a=0,b=1){
+  #Check the bounds of x per the density function. 
+  if(a <= x && x <= b){
+    return(1/(b-a))
+  }
+  #If the check fails, return 0 instead.
+  return(0)
+}
+
+#x<a
+duniform(1,2,3)
+
+#a<x<b
+duniform(3,2,4)
+
+#b<x
+duniform(6,7,3)
+
+
+#b. Duniform with vector input modification
+duniformVec = function(x,a=0,b=1){
+  output = NULL
+  
+  #Grab indicies that correspond to the length of x. 
+  for(i in 1:length(x)){
+    #Check the bounds of x per the density function. 
+    if(a <= x[i] && x[i] <= b){
+      output[i] = (1/(b-a))
+    }
+    else{
+      output[i] = 0
+    }
+  }
+  
+  #Once we finish looping and adding to output, return the vector
+  return(output)
+}
+#Test code
+data.frame( x=seq(-1, 12, by=.001) ) %>%
+  mutate( y = duniformVec(x, 4, 8) ) %>%
+  ggplot( aes(x=x, y=y) ) +
+  geom_step()
+
+#c.Microbenchmark the duniformVec function.
+microbenchmark::microbenchmark( duniformVec( seq(-4,12,by=.0001), 4, 8), times=100)
+
+
+
+#d. Optimized duniform function using the ifelse command instead of a for loop.
+duniformOpt = function(x,a=0,b=1){
+  return(ifelse(a<=x & x <= b, 1/(b-a), 0))
+}
+
+#Test code
+data.frame( x=seq(-1, 12, by=.001) ) %>%
+  mutate( y = duniformOpt(x, 4, 8) ) %>%
+  ggplot( aes(x=x, y=y) ) +
+  geom_step()
+
+#Microbenchmark
+microbenchmark::microbenchmark( duniformOpt( seq(-4,12,by=.0001), 4, 8), times=100)
+
+#d. The function with the ifelse command ran much faster than the for loop function. To me, I like the for loop function better
+# as that is what I am used to. However, ifelse takes much of the work out of writing a for loop explicitly, so it is faster 
+# to write and analyze. 
+```
+
+# Exercise 2 - Test default values of duniform
+```{r}
+duniform(0)
+#This is working properly as I set default values in duniform in exercise 1. 
+# 1/(b-a) = 1/(1-0) = 0. As x = 0 and a <= x <= b = 0 <= 0 <= 1. 
+
+```
+# Exercise 3 - Function to produce a standardized vector of numeric variables.
+```{r}
+standardize <- function(x){
+  return(x-mean(x))/(sd(x))
+}
+
+data( 'iris' )
+# Graph the pre-transformed data.
+ggplot(iris, aes(x=Sepal.Length, y=Sepal.Width, color=Species)) +
+  geom_point() +
+  labs(title='Pre-Transformation')
+
+# Standardize the numeric columns
+iris.z <- iris %>% mutate_if( is.numeric, standardize )
+
+# Graph the post-transformed data.
+ggplot(iris.z, aes(x=Sepal.Length, y=Sepal.Width, color=Species)) +
+  geom_point() +
+  labs(title='Post-Transformation')
+
+
+```
+
+# Exercise 4 - FizzBuzz function in R
+```{r}
+fizzbuzz = function(n){
+  output = NULL
+  for(i in 1:n){
+    if((i %% 3 == 0) && (i %% 5 == 0)){
+      output[i] = "FizzBuzz"
+    }
+    else if(i %% 3 == 0){
+      output[i] = "Fizz"
+    }
+    
+    else if(i %% 5 == 0){
+      output[i] = "Buzz"
+    }
+    
+    else{
+      output[i] = i
+    }
+  }
+  return(output)
+}
+
+fizzbuzz(20)
+```
+
+# Exercise 5 - Debugging a bootstrap CI function
+```{r, warning=FALSE, message=FALSE}
+#' Calculate bootstrap CI for an lm object
+#' 
+#' @param model
+#' @param N
+boot.lm <- function(model, N=1000){
+  #browser()
+  data    <- model$model  # Extract the original data
+  formula <- model$terms  # and model formula used
+  # Start the output data frame with the full sample statistic
+  output <- broom::tidy(model) %>% 
+    select(term, estimate) %>% 
+    spread(term, estimate)
+
+  for( i in 1:N ){
+    data <- data %>% sample_frac( replace=TRUE )
+    model.boot <- lm( formula, data=data)
+    coefs <- broom::tidy(model.boot) %>% 
+      select(term, estimate) %>% 
+      spread(term, estimate)
+  }  
+  output <- output %>% rbind( coefs )
+  return(output)
+}
+
+# Run the function on a model
+m <- lm( Volume ~ Girth, data=trees )
+boot.dist <- boot.lm(m)
+
+# If boot.lm() works, then the following produces a nice graph
+boot.dist %>% gather('term','estimate') %>% 
+  ggplot( aes(x=estimate) ) + 
+  geom_histogram() + 
+  facet_grid(.~term, scales='free')
+```
+

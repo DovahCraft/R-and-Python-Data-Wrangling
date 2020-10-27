@@ -1,0 +1,237 @@
+---
+title: "Module11"
+author: "Joe Vargovich"
+date: "10/3/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(refinr)
+library(plyr)
+```
+
+# Exercise 1 - Regular expression analysis
+
+```{r}
+#a. This matches strings that contain a.  
+strings <- c('a','b','ba','c', 'cccba')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, 'a') )
+
+#b. This matches strings with the substring ab in them
+strings <- c('cc','ab', 'b', 'abba', 'ba')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, 'ab') )
+
+#c. This matches strings that contain a or b.
+strings <- c('abab', 'ab', 'cb', 'cba', 'cab', 'd', 'cc', 'cfcds')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '[ab]') )
+
+#d. This matches strings that begin with a or b.
+strings <- c('a', 'b', 'cb', 'bc', 'c', 'cd')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '^[ab]') )
+
+#e. Begins with one or more digits and has a space separating them from an a or A.
+strings <- c('ab', '1a', '1 a', '121221323123434325324 a', 'a 1221', '12 Aa', '12 b')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '\\d+\\s[aA]') )
+
+#f. Begins with one or more digits and has 0 or more spaces seperating digits from a or A.
+strings <- c('1212134a', '12231 a', '121323 A', '12213434A', '223443 B', 'aasdf 12', '12 aa')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '\\d+\\s*[aA]') )
+
+#g. Captures anything as . is a wildcard general capture. Can have any length due to the Kleene star operator.
+strings <- c('Whatever', 'I', 'Want', '', 'dasfasdfsdffsdafdsfsadafds')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '.*') )
+
+#h. Begins with two alphanumeric characters and ends with bar.
+strings <- c('aabar', 'dasdfbar', 'bbar', 'bbbar', 'xyz', 'xyzbar', 'xybar')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '^\\w{2}bar') )
+
+#i. Captures foo.bar OR two alphanumeric chars followed by bar 
+strings <- c('foo.bar', 'foobar', 'aabar', 'aabar', 'bar.foo', 'sdaf', 'gxxxbar', 'gzbar')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '(foo\\.bar)|(^\\w{2}bar)') )
+```
+# Exercise 2 - File name parsing for camera images
+
+```{r}
+file.names <- c( 'S123.P2.C10_20120621_213422.jpg',
+                 'S10.P1.C1_20120622_050148.jpg',
+                 'S187.P2.C2_20120702_023501.jpg')
+#Produce a dataframe with columns corresponding to the site, plot, camera, year, month, day, hour, minute, and second for these three file neames.
+
+#I tried to do it more elegantly with string.split, but I couldn't get the numbers formatted correctly. I would love to talk about this one. 
+splitStrings = str_replace_all(file.names, pattern='\\.', replacement="_")
+
+for(i in splitStrings){
+  finalSplit = str_split(splitStrings, pattern='_')  
+}
+
+df = ldply(finalSplit, data.frame)
+
+df2 = do.call(rbind.data.frame, finalSplit)
+
+#Brute forceish, but this is how I will build it using the substring range function
+site_vec = NULL
+plot_vec = NULL
+camera_vec = NULL
+year_vec = NULL
+month_vec = NULL
+day_vec = NULL
+hour_vec = NULL
+minute_vec = NULL
+second_vec = NULL
+
+#Build sites column
+site_vec = site_vec %>%
+    append(str_sub(file.names[1], start=1, end=4)) %>%
+    append(str_sub(file.names[2], start=1, end=3)) %>%
+    append(str_sub(file.names[3], start=1, end=4)) 
+
+site_vec
+
+#Build plot_vec
+plot_vec = plot_vec %>%
+    append(str_sub(file.names[1], start=6, end=7)) %>%
+    append(str_sub(file.names[2], start=5, end=6)) %>%
+    append(str_sub(file.names[3], start=6, end=7)) 
+
+plot_vec
+
+#Build Camera
+camera_vec = camera_vec %>%
+    append(str_sub(file.names[1], start=9, end=11)) %>%
+    append(str_sub(file.names[2], start=8, end=9)) %>%
+    append(str_sub(file.names[3], start=9, end=10)) 
+
+camera_vec
+
+#Build Year
+year_vec = year_vec %>%
+    append(str_sub(file.names[1], start=13, end=16)) %>%
+    append(str_sub(file.names[2], start=11, end=14)) %>%
+    append(str_sub(file.names[3], start=12, end=15)) 
+
+year_vec
+
+#Build Month
+month_vec = month_vec %>%
+    append(str_sub(file.names[1], start=17, end=18)) %>%
+    append(str_sub(file.names[2], start=15, end=16)) %>%
+    append(str_sub(file.names[3], start=16, end=17)) 
+
+month_vec
+
+
+#Build Day
+day_vec = day_vec %>%
+    append(str_sub(file.names[1], start=19, end=20)) %>%
+    append(str_sub(file.names[2], start=17, end=18)) %>%
+    append(str_sub(file.names[3], start=18, end=19)) 
+
+day_vec
+
+
+#Build Hour
+hour_vec = hour_vec %>%
+    append(str_sub(file.names[1], start=22, end=23)) %>%
+    append(str_sub(file.names[2], start=20, end=21)) %>%
+    append(str_sub(file.names[3], start=21, end=22)) 
+
+hour_vec
+
+
+#Build Minute
+minute_vec = minute_vec %>%
+    append(str_sub(file.names[1], start=24, end=25)) %>%
+    append(str_sub(file.names[2], start=22, end=23)) %>%
+    append(str_sub(file.names[3], start=23, end=24)) 
+
+minute_vec
+
+
+#Build Second
+second_vec = second_vec %>%
+    append(str_sub(file.names[1], start=26, end=27)) %>%
+    append(str_sub(file.names[2], start=24, end=25)) %>%
+    append(str_sub(file.names[3], start=25, end=26)) 
+
+second_vec
+
+result = data.frame(
+  Site = site_vec,
+  Plot = plot_vec,
+  Camera = camera_vec,
+  Year = year_vec,
+  Month = month_vec,
+  Day = day_vec,
+  Hour = hour_vec,
+  Minute = minute_vec,
+  Second = second_vec
+)
+
+result
+```
+
+# Exercise 3 - Gettysberg address parsing
+
+```{r}
+Gettysburg <- 'Four score and seven years ago our fathers brought forth on this 
+continent, a new nation, conceived in Liberty, and dedicated to the proposition 
+that all men are created equal.
+
+Now we are engaged in a great civil war, testing whether that nation, or any 
+nation so conceived and so dedicated, can long endure. We are met on a great 
+battle-field of that war. We have come to dedicate a portion of that field, as 
+a final resting place for those who here gave their lives that that nation might 
+live. It is altogether fitting and proper that we should do this.
+
+But, in a larger sense, we can not dedicate -- we can not consecrate -- we can 
+not hallow -- this ground. The brave men, living and dead, who struggled here, 
+have consecrated it, far above our poor power to add or detract. The world will 
+little note, nor long remember what we say here, but it can never forget what 
+they did here. It is for us the living, rather, to be dedicated here to the 
+unfinished work which they who fought here have thus far so nobly advanced. It 
+is rather for us to be here dedicated to the great task remaining before us -- 
+that from these honored dead we take increased devotion to that cause for which 
+they gave the last full measure of devotion -- that we here highly resolve that 
+these dead shall not have died in vain -- that this nation, under God, shall 
+have a new birth of freedom -- and that government of the people, by the people, 
+for the people, shall not perish from the earth.'
+
+#Pipe the gettysburg string and remove invalid characters
+Gettysburg %>% 
+  str_remove_all(pattern = '-') %>%
+  str_remove_all(pattern = '\\.|,|\\?|!') %>%
+  str_split(pattern='\\s+') %>%
+  .[[1]] %>%
+    str_length() %>%
+    mean()
+```
+# Exercise 4 - Creating a variable name regular expression.
+
+```{r}
+#a. Write a regex to determine if a string starts with a character (upper or lower case) 
+# or underscore and then is followed by zero or more numbers, letters, periods, or underscores. 
+strings <- c('foo15', 'Bar', '.resid', '_14s', 
+             '99_Bottles', '.9Arggh', 'Foo!','HIV Rate')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '^[\\w|\\W|_][0-9a-zA-Z\\._]*$') )
+
+#b. Modify regex so the first group can only be [a-zA-Z_]
+strings <- c('foo15', 'Bar', '.resid', '_14s', 
+             '99_Bottles', '.9Arggh', 'Foo!','HIV Rate')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '^[a-zA-Z_][0-9a-zA-Z\\._]*$') )
+
+```
+
+
