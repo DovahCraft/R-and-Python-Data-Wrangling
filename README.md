@@ -171,4 +171,4 @@ Used to create textbooks using R markdown. https://bookdown.org
 
 
 # Presentation
-Coming Soon!
+Coming soon, presentation is on Wednesday, 11/18.
