@@ -155,6 +155,11 @@ Good comparison of data reshaping with R and Python Pandas https://pandas.pydata
 Merging and combining in Pandas: https://pandas.pydata.org/pandas-docs/stable/user_guide/merging.html
 Count and Series to Dataframe conversions for problem 1: https://stackoverflow.com/questions/38933071/group-by-two-columns-and-count-the-occurrences-of-each-combination-in-pandas
 
+**Module 16(11/9/2020)**
+Pandas read_html for web scraping: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_html.html
+Beautiful Soup + Pandas: https://stackoverflow.com/questions/50633050/scrape-tables-into-dataframe-with-beautifulsoup (See answer 2, not the accepted answer)
+Mod_security workaround for 405 Forbidden errors: https://stackoverflow.com/questions/16627227/http-error-403-in-python-3-web-scraping?lq=1
+
 **Needed libraries:**
 
 **Pandas** for data frames
