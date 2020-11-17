@@ -1,0 +1,201 @@
+---
+title: "Module14"
+author: "Joe Vargovich"
+date: "10/27/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(latex2exp)
+library(ggrepel)
+```
+
+# Exercise 1 - CO2 emissions worldwide
+```{r, message=FALSE}
+#a. Load the data and filter to the current year. 
+carbonDf = read_csv("co2_emissions_tonnes_per_person.csv")
+#Select only 2018
+carbonDf = carbonDf %>%
+  select("country","2018")
+
+#Load the geoDataSet
+geoData = ggplot2::map_data('world')
+
+#Here I tried the standardization method, but it wouldn't join right for me.
+# standardCountries = tribble(
+#   ~raw, ~standardized,
+#  # 'Antigua' = 'Antigua and Barbuda',
+#   #'Barbuda' = 'Antigua and Barbuda', 
+#   'Congo, Rep.' = 'Democratic Republic of the Congo',
+#   'Congo, Dem. Rep.' = 'Democratic Republic of the Congo',
+#   'Congo, Rep.' = 'Democratic Republic of the Congo',
+#   'Cote d\'Ivoire' = 'Ivory Coast',
+#   'Swaziland' = 'Estwatini',
+#   'Kyrgystan' = 'Kyrgyz Republic',
+#   'Laos' = 'Laos',
+#   'Micronesia' = 'Micronesia Fed States',
+#   'Macedonia' = 'North Macedonia',
+#   'Slovakia' = 'Slovak Republic',
+#   'Saint Kitts' = 'St. Kitts and Nevis',
+#   'Saint. Lucia' = 'St. Lucia',
+#   'Grenadines' = 'St. Vincent and the Grenadines',
+#   'Trinidad' = 'Trinidad and Tobago',
+#   'Tobago' = 'Trinidad and Tobago',
+#   'Tuvalu' = 'Tuvalu',
+#   'UK', 'United Kingdom',
+#   'USA', 'United States'
+# )
+# 
+# standardCountries
+# 
+# carbonDf = inner_join(standardCountries, carbonDf, by=c("raw"="country"))
+# carbonDf
+
+#Thus I did some recodings to match the geoData to the carbonDf.
+ geoData = geoData %>%
+  mutate(region = factor(region),
+         region = fct_recode(region, 'United States' = 'USA'),
+         region = fct_recode(region, 'United Kingdom' = 'UK'),
+         region = fct_recode(region, 'Cote d\'Ivoire' = 'Ivory Coast'),
+         region = fct_recode(region, 'Congo, Rep.' = 'Democratic Republic of the Congo'),
+         region = fct_recode(region, 'St. Lucia' = 'Saint Lucia'),
+         region = fct_recode(region, 'Slovak Republic' = 'Slovakia'),
+         region = fct_recode(region, 'Lao' = 'Laos'),
+         region = fct_recode(region, 'Eswatini' = 'Swaziland'),
+         region = fct_recode(region, 'Micronesia, Fed. Sts.' = 'Micronesia'),
+         region = fct_recode(region, 'Kyrgyz Republic' = 'Kyrgyzstan'),
+         region = fct_recode(region, 'St. Kitts and Nevis' = 'Saint Kitts'),
+         region = fct_recode(region, 'St. Vincent and the Grenadines' = 'Grenadines'),
+         region = fct_recode(region, 'Antigua and Barbuda' = 'Antigua'),
+         region = fct_recode(region, 'Antigua and Barbuda' = 'Barbuda'),
+         region = fct_recode(region, 'North Macedonia' = 'Macedonia'),
+         region = fct_recode(region, 'Trinidad and Tobago' = 'Trinidad'),
+  )
+#Join with our new matching labels
+joinedDf = inner_join(carbonDf, geoData, by=c("country"="region"))
+
+#Rename the 2018 variable to something more descriptive. 
+joinedDf = rename(joinedDf, carbon = '2018')
+head(joinedDf)
+
+#Create our carbon map with fill color based on carbon levels.
+plot = ggplot(joinedDf, aes(x = long, y = lat, group = group, fill=carbon)) +
+  geom_polygon( colour = "white") +
+  labs(
+    fill = "Carbon Levels",
+    title = "Map of Worldwide Carbon Emissions"
+  ) 
+plot #Default color scheme and gradient
+
+#Inverted plot (I think this communicates high emissions better.)
+plotInverted = plot +
+  scale_fill_gradient(
+  low = "#56B1F7",
+  high = "#132B43",
+)
+plotInverted
+
+#Another cool color idea, even clearer! 
+plotRed = plot +
+ scale_fill_gradient(
+  low = "#56B1F7",
+  high = "red",
+) 
+plotRed
+```
+
+# Exercise 3 - Infmort dataset scatterplots
+```{r, warning=FALSE}
+#Load the infmort dataset
+data(infmort, package='faraway')
+
+#infmort can be visualized using region and oil as facets. 
+
+#Rownames are something we want to access for our labels, let's make them a col.
+infmortNew = rownames_to_column(infmort, var="country")
+
+#Filter the infmort data down into some countries we want to label
+target = c("Australia", "France", "Saudi_Arabia", "United_States", 
+           "Canada", "Australia", "Congo", "China", "Egypt", "Algeria",
+            "Nigeria", "Libya", "Ecuador", "Venezuela")
+labeledCountries = infmortNew %>%
+  mutate(
+    country = str_trim(country)) %>%
+  filter(country %in% target)
+head(labeledCountries)
+
+#a. Create scatter plots of countries income and infant mortality using a 
+# log10 transformation for both axes.
+plot = ggplot(infmort, aes(x=log10(income), y= log10(mortality))) +
+  geom_point() + 
+  facet_grid(oil ~ region) + 
+  #b. Label 10-15 countries across the regions.
+  geom_label_repel(data=labeledCountries, aes(label=country)) +
+  labs(
+    title = "Oil Exports and Infant Mortality for Regions of the World",
+    x = "Average Income",
+    y = "Infant Mortality Rate"
+  ) 
+plot
+```
+
+
+# Exercise 4 - Trees dataset regression model and graphing
+```{r, warning=FALSE}
+trees = datasets::trees
+#a. Create regression model for Volume as a function of Height
+model <- lm( Volume ~ Height, data=trees)     # Fit a regression model
+trees <- trees %>%                    # save the regression line yhat points
+  mutate(fit=fitted(model))
+head(trees)
+
+#b. Get the y-intercept and slope of regression line
+#This is given by the linear model object
+coefs = model$coefficients
+
+#c. Plot the data
+plot = ggplot(trees, aes(x=Height)) +
+  geom_point(aes(y=Volume)) + 
+  geom_line(aes(y=fit), color='green') +
+  annotate('rect', xmin=65, xmax=72, ymin=64, ymax=78,
+           fill='white', color='black') + 
+  annotate('text',x=68.5, y=75, label = TeX('$\\hat{y}_i = -36.94 + 5.1*x_i$')) +
+  annotate('text', x=67.5, y = 67, label=TeX('$R^2 = 0.934$')) + 
+  labs(
+    title = "Relationship between Volume and Height of Trees."
+  )
+plot
+```
+
+
+# Exercise 5 - Titanic Survival Statistics
+```{r}
+#Load the data
+Titanic = datasets::Titanic
+Titanic = Titanic %>% as.data.frame() %>%
+  group_by(Age, Class)
+head(Titanic)
+
+#a. Create the plot showing the number of survivors of each class and gender.
+defaultPlot = ggplot(Titanic, aes(x=Age, y=Freq), group=Sex, color=Class) +
+ geom_col(aes(x=Age,fill=Survived)) + 
+  facet_grid(Sex ~ Class)
+defaultPlot
+
+#b. Create the plot using the theme_bw
+bwPlot = defaultPlot + theme_bw()
+bwPlot
+
+#c. Create the plot using a minimial hgrid theme
+minimalPlot = defaultPlot + cowplot::theme_minimal_hgrid()
+minimalPlot
+
+#d. Is removing the vertical grid lines good or not?
+#Removing the vertical grid lines declutters the noise of the default 
+#grid theme. This allows us to see the bars more easily while still retaining
+# the useful horizontal grid lines used to measure the values of the bars. 
+```
+
+

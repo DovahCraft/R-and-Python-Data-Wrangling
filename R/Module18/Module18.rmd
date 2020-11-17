@@ -1,0 +1,63 @@
+---
+title: "Module18"
+author: "Joe Vargovich"
+date: "11/10/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(DBI)
+library(dbplyr)
+library(nycflights13)
+library(RSQLite)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercise 1 - SQLite database for nycflights13
+```{r}
+
+#a.Start up a SQL-Lite database with the NYCFlights13 data pre-loaded
+con <- nycflights13_sqlite( )
+
+#b. Connect to the flights and airlines tables. 
+flights = tbl(con, "flights")
+airlines = tbl(con, "airlines")
+head(flights)
+head(airlines)
+
+#c. Percentage of late flights by carrier.
+#Join our dataframes by carrier
+combinedDf = inner_join(flights, airlines) %>%
+  mutate(
+    delayed = ifelse(dep_delay >= 10, "Late", "OnTime")
+  )
+
+#Count occurances of ontime and delayed flights and find the percent late. 
+lateDf = combinedDf %>%
+  as.data.frame() %>% #Needed to convert to a dataframe first before pivoting.
+  count(name, delayed) %>%
+  filter(!is.na(delayed)) %>%
+  pivot_wider(names_from=delayed, values_from=n) %>%
+  mutate(
+    PercentLate = round(((Late)/(Late + OnTime) * 100), 2)
+  )
+lateDf
+
+#d. Close the connection
+dbDisconnect(con)
+
+```
+
+# Exericse 2 - Create Sqlite database manually
+```{r}
+#Here we create a .db file to hold the database created. We also connect to it.
+con <- DBI::dbConnect(RSQLite::SQLite(), dbname = "TestSQLiteFile.db")
+
+# Create a table using the iris data
+dbCreateTable(con, 'IRIS', iris)
+head(iris)
+dbListTables(con)
+dbDisconnect(con)
+```
+

@@ -1,0 +1,24 @@
+---
+title: "PresentationSamples"
+author: "Joe Vargovich"
+date: "11/15/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(stringr)
+```
+
+## Snippet showing piping to simulate Python method chaining        
+```{r}
+sampleStr = "Hello world!"
+
+sampleStr = sampleStr %>%
+  toupper() %>%
+  tolower() %>%
+  str_split(" ")
+sampleStr
+```
+

@@ -13,7 +13,7 @@ library(tidyverse)
 # Exercise 1 - Create vectors of length three and add them. 
 ```{r}
 vec_a = c(2,4,6)
-vec_b = c(8,10,12)
+vec_b = c(8,10)
 
 vec_c = vec_a + vec_b
 

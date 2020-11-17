@@ -1,0 +1,21 @@
+---
+title: "weatherGraphs"
+author: "Joe Vargovich"
+date: "11/2/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(VargovichFlagstaffWeather)
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+View(Flagstaff_Weather)
+ggplot(Flagstaff_Weather, aes(x=DATE, y=TMAX)) +
+  geom_line()
+
+ggplot(Flagstaff_Weather, aes(x=DATE, y=PRCP)) +
+  geom_line()
+```
+

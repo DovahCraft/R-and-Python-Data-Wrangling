@@ -1,0 +1,109 @@
+---
+title: "Module16"
+author: "Joe Vargovich"
+date: "11/5/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rvest)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Exercise 1 - Crash Data Scrape
+```{r, fig.height=10}
+url = "https://www.iihs.org/topics/fatality-statistics/detail/state-by-state"
+page = read_html(url)
+
+CrashData = page %>%
+  html_nodes('table') %>%
+  .[[1]] %>%
+  html_table(header=FALSE, fill=TRUE) %>%
+  select(X1,X2, X6) %>%
+  slice(-1:-2) %>%
+  magrittr::set_colnames(c('State','Population', 'Deaths')) %>%
+  mutate_at( vars(matches('Deaths')), str_remove_all, ',') %>%           # remove all commas
+  mutate_at( vars(matches('Deaths')), str_remove, '\\[[0-9]+\\]') %>%    # remove [7] stuff
+  mutate_at( vars( matches('Deaths')), as.numeric) %>%
+  mutate_at( vars(matches('Population')), str_remove_all, ',') %>%           # remove all commas
+  mutate_at( vars(matches('Population')), str_remove, '\\[[0-9]+\\]') %>%    # remove [7] stuff
+  mutate_at( vars( matches('Population')), as.numeric) %>%
+  filter(State != "U.S. total")
+head(CrashData)
+
+#Plot our data
+plotOfDeath = ggplot(CrashData, aes(x=State, y=Deaths)) +
+  geom_col() + 
+  coord_flip()
+plotOfDeath
+```
+#Exercise 2 - 
+```{r, fig.height=10, fig.width=10}
+url = "https://www.iihs.org/topics/fatality-statistics/detail/state-by-state"
+page = read_html(url)
+
+CrashDataRestraint = page %>%
+  html_nodes('table') %>%
+  .[[5]] %>%
+  html_table(header=FALSE, fill=TRUE) %>%
+  select(X1, X3, X5) %>%
+  slice(-1:-3) %>%
+  magrittr::set_colnames(c('State', 'SeatbeltDeaths', 'NonSeatbeltDeaths')) %>%
+  mutate_at( vars(matches('SeatbeltDeaths')), str_remove_all, ',') %>%           # remove all commas
+  mutate_at( vars(matches('SeatbeltDeaths')), str_remove, '\\[[0-9]+\\]') %>%    # remove [7] stuff
+  mutate_at( vars( matches('SeatbeltDeaths')), as.numeric) %>%
+  mutate_at( vars(matches('NonSeatbeltDeaths')), str_remove_all, ',') %>%           # remove all commas
+  mutate_at( vars(matches('NonSeatbeltDeaths')), str_remove, '\\[[0-9]+\\]') %>%    # remove [7] stuff
+  mutate_at( vars( matches('NonSeatbeltDeaths')), as.numeric)
+joinedDf = inner_join(CrashData, CrashDataRestraint)
+  
+joinedDf = joinedDf %>%
+  mutate(
+    SeatbeltScaled = SeatbeltDeaths/Population * 100000,
+    NonSeatbeltScaled = NonSeatbeltDeaths/Population * 100000
+  ) %>% 
+  select(State, SeatbeltScaled, NonSeatbeltScaled) %>%
+  pivot_longer(SeatbeltScaled:NonSeatbeltScaled, 
+               names_to = "RestraintUsage",
+               values_to = "Deaths") %>%
+  mutate(
+    RestraintUsage = factor(RestraintUsage)
+    )
+head(joinedDf)
+
+#I wasn't sure of the best way to show this data in a scatter plot,
+# So I made two for good measure. 
+restraintPlot = ggplot(joinedDf, aes(x=State, y=Deaths)) +
+  geom_point() +
+  coord_flip() + 
+  facet_wrap(.~RestraintUsage) +
+  labs(
+    title = "Amount of Deaths per 100,000 people with and without seatbelt usage."
+  )
+restraintPlot
+
+restraintPlot2 = ggplot(joinedDf, aes(x=State, y=Deaths)) +
+  geom_point(aes(color=RestraintUsage)) +
+  theme(axis.text.x = element_text(face = "bold", color = "#993333", 
+                           size = 12, angle = 90)) +
+  labs(
+    title = "Amount of Deaths per 100,000 people with and without seatbelt usage."
+  )
+restraintPlot2
+```
+
+
+# Exercise 3 - Reddit Headlines Data Scraping
+```{r}
+url = "https://www.reddit.com/r/NAU/new"
+page = read_html(url)
+
+firstHeadlines = page %>%
+  html_nodes('.SQnoC3ObvgnGjWt90zD9Z ._eYtD2XCVieq6emjKBH3m') %>%
+  html_text()
+
+head(firstHeadlines)
+```
+
+

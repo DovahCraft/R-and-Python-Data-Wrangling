@@ -1,0 +1,25 @@
+---
+title: "Module15"
+author: "Joe Vargovich"
+date: "11/2/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(usethis)
+```
+
+# Exercise 1 - Creating an R package and filtering data
+```{r}
+dataLink = "https://raw.githubusercontent.com/dereksonderegger/444/master/data-raw/Pulliam_Airport_Weather_Station.csv"
+metadataLink = "https://raw.githubusercontent.com/dereksonderegger/444/master/data-raw/Pulliam_Airport_Weather_Station_Metadata.txt"
+
+
+data = read_csv(dataLink)
+metadata = read_csv(metadataLink)
+head(data)
+
+```
+
