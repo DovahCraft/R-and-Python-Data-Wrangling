@@ -176,4 +176,4 @@ Used to create textbooks using R markdown. https://bookdown.org
 
 
 # Presentation
-Coming soon, presentation is on Wednesday, 11/18.
+See the final presentation directory to view the slides comparing R and Python.
